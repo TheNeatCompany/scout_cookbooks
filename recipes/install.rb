@@ -1,4 +1,6 @@
-<<<<<<< HEAD
+#installs scout gems/dependencies (minus cron)
+
+
 #
 # Cookbook Name:: scout
 # Recipe:: default
@@ -22,28 +24,9 @@ end.run_action(:create)
 
 # install scout agent gem
 if node[:scout][:version]
-  Scout.install_gem(node, ["scout", "--version", "#{node[:scout][:version]}"])
+  Scout.install_gem(node, "scout --version #{node[:scout][:version]}")
 else
-  Scout.install_gem(node, ["scout"])
-end
-
-if node[:scout][:key]
-  scout_bin = Scout.scout_binary(node)
-  name_attr = node[:scout][:name] ? %{ --name "#{node[:scout][:name]}"} : ""
-  server_attr = node[:scout][:server] ? %{ --server "#{node[:scout][:server]}"} : ""
-  roles_attr = node[:scout][:roles] ? %{ --roles "#{node[:scout][:roles].map(&:to_s).join(',')}"} : ""
-  http_proxy_attr = node[:scout][:http_proxy] ? %{ --http-proxy "#{node[:scout][:http_proxy]}"} : ""
-  https_proxy_attr = node[:scout][:https_proxy] ? %{ --https-proxy "#{node[:scout][:https_proxy]}"} : ""
-  environment_attr = node[:scout][:environment] ? %{ --environment "#{node[:scout][:environment]}"} : ""
-
-  # schedule scout agent to run via cron
-  cron "scout_run" do
-    user node[:scout][:user]
-    command "#{scout_bin} #{node[:scout][:key]}#{name_attr}#{server_attr}#{roles_attr}#{http_proxy_attr}#{https_proxy_attr}#{environment_attr}"
-    only_if do File.exist?(scout_bin) end
-  end
-else
-  Chef::Log.warn "The agent will not report to scoutapp.com as a key wasn't provided. Provide a [:scout][:key] attribute to complete the install."
+  Scout.install_gem(node, "scout")
 end
 
 if node[:scout][:public_key]
@@ -80,7 +63,7 @@ else
 end
 
 (node[:scout][:plugin_gems] || []).each do |gemname|
-  Scout.install_gem(node, [gemname])
+  Scout.install_gem(node, gemname)
 end
 
 # Create plugin lookup properties
@@ -105,7 +88,3 @@ template "/home/#{node[:scout][:user]}/.scout/plugins.properties" do
   }
   action :create
 end
-=======
-include_recipe "#{cookbook_name}::install"
-include_recipe "#{cookbook_name}::run"
->>>>>>> Separating scout agent configuration from scout installation.
