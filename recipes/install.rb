@@ -24,9 +24,9 @@ end.run_action(:create)
 
 # install scout agent gem
 if node[:scout][:version]
-  Scout.install_gem(node, "scout --version #{node[:scout][:version]}")
+  Scout.install_gem(node, ["scout", "--version", "#{node[:scout][:version]}"])
 else
-  Scout.install_gem(node, "scout")
+  Scout.install_gem(node, ["scout"])
 end
 
 if node[:scout][:public_key]
@@ -63,7 +63,7 @@ else
 end
 
 (node[:scout][:plugin_gems] || []).each do |gemname|
-  Scout.install_gem(node, gemname)
+  Scout.install_gem(node, [gemname])
 end
 
 # Create plugin lookup properties
